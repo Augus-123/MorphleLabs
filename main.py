@@ -5,33 +5,28 @@ import subprocess
 
 app = Flask(__name__)
 
-
 @app.route('/htop')
 def htop():
-    # Get the system username
-    username = os.getlogin()
+    username = os.environ.get('USER', 'Unknown User')
 
-    # Get server time in IST
     ist_time = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).strftime(
         '%Y-%m-%d %H:%M:%S')
 
-    # Get tasklist command output (for Windows)
     try:
-        tasklist_output = subprocess.check_output(['tasklist'], universal_newlines=True)
+        top_output = subprocess.check_output(['top', '-b', '-n', '1'], universal_newlines=True)
     except Exception as e:
-        tasklist_output = str(e)
+        top_output = str(e)
 
-    # Define the HTML template
     html_content = f"""
     <!doctype html>
     <html>
     <head><title>System Info</title></head>
     <body>
         <h1>System Information</h1>
-        <p><strong>Name:</strong> Augutine Ullas</p>
+        <p><strong>Name:</strong> Your Full Name</p>
         <p><strong>Username:</strong> {username}</p>
         <p><strong>Server Time (IST):</strong> {ist_time}</p>
-        <pre>{tasklist_output}</pre>
+        <pre>{top_output}</pre>
     </body>
     </html>
     """
@@ -39,4 +34,4 @@ def htop():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)  # Public visibility
+    app.run(port=5000)  
